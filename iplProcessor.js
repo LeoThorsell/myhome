@@ -44,7 +44,6 @@ exports.iplProcessor = function(){
 			receivers.forEach(function(receiver){
 				me.ipl.seaport.get(receiver, function(ports){
 					var port = ports[0];
-					console.log(port);
 					var conn = net.connect(port.port, port.host, function(){
 						conn.write(outMessage);
 					});

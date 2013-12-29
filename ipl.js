@@ -11,7 +11,7 @@ var getModuleContext = function(userId, moduleId, moduleName){
 		'userId':userId,
 		'moduleId': moduleId,
 		'moduleName': moduleName,
-		'database': client,
+		'database': redis.createClient(),
 		'seaport': seaport.connect('localhost', 4100),
 		'triggerChanged': function(outMessage){
 			outMessage.userId = this.userId;
