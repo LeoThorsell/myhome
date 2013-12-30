@@ -45,26 +45,32 @@ var deviceKeysToCompare = ['protocol', 'house', 'unit'];
 var doAction = function(){
 	client.blpop('user:1.tellstickActuator:1.raw', 0, function(err, result){
 		var actuatorString = result[1];
-		var deviceToOperate = null;
+		var deviceToOperate = -1;
 		console.log('actuator hw, command');
 		var keyValues = actuatorString.split(';');
 		var actuator = {};
 		keyValues.forEach(function(keyValue){
-				var splitted = keyValue.split(':');
-				if(splitted.length == 2)
-					actuator[splitted[0]]=splitted[1];
+			var splitted = keyValue.split(':');
+			if(splitted.length != 2)
+				return;
+			actuator[splitted[0]]=splitted[1];
 		});
-		devices.forEach(function(device){
-			if(deviceToOperate == null){
-				deviceToOperate = device;
-				for(key in device){
-					if(deviceKeysToCompare.indexOf(key) > -1){
-						if(device[key] != actuator[key]){
-							deviceToOperate = null;
-						}
-					}
+		devices.forEach(function loop(device){
+			if(loop.stop)
+				return;
+			var correctDevice = true;
+			for(key in device){
+				if(deviceKeysToCompare.indexOf(key) == -1)
+					continue;
+				if(device[key] != actuator[key]){
+					correctDevice = false;
+					break;
 				}
 			}
+			if(!correctDevice)
+				return;
+			loop.stop = true;
+			deviceToOperate = device;
 		});
 		if(deviceToOperate == null){
 			deviceToOperate = createDevice(actuator);
