@@ -1,3 +1,5 @@
+var util = require('util');
+
 exports.tellstickActuator = function tellstickActuator()
 {
 	this.ipl = null;
@@ -6,13 +8,14 @@ exports.tellstickActuator = function tellstickActuator()
 		this.ipl = ipl;
 		var me = this;
 		this.ipl.message(function(message){
-			var dummy = "";
-			if(message.command == 'on')
-				dummy = 'class:command;protocol:arctech;model:selflearning;house:10793614;unit:11;group:0;method:turnon;';
-			else
-				dummy = 'class:command;protocol:arctech;model:selflearning;house:10793614;unit:11;group:0;method:turnoff;';
-			console.log('actuator ' + message);
-			me.ipl.database.lpush('user:1.tellstickActuator:1.raw', dummy);
+			var ts = me.ipl.settings.tellstick;
+			var raw = "";
+			for(var key in ts){
+				raw += key+':'+ts[key]+';';
+			}
+			raw += 'method:turn' + message.command + ';';
+			console.log(raw);
+			me.ipl.database.lpush('user:1.tellstickActuator:1.raw', raw);
 		});
 	}
 }

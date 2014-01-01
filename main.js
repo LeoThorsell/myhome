@@ -34,5 +34,19 @@ function init(){
 };
 var iplProc = new iplProcessor.iplProcessor();
 iplProc.init(ipl.getModuleContext(1, 1, 'IplProcessor'));
-//client.set('user:1.cronScheduler:1', JSON.stringify( {name:'crontest', cron:'0-58/2 * * * *', command:'on'}));
+function redis()
+{
+	client.set('user:1.tellstickActuator:2', JSON.stringify(
+	{
+		name:'Actuator2', 
+		tellstick:{
+			'class':'command',
+			protocol:'arctech',
+			model:'selflearning',
+			house:'1074',
+			unit:'1'
+		}
+	}));
+}
+//redis();
 init();
