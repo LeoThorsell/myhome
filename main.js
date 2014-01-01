@@ -11,6 +11,7 @@ var	tellstickHw = require('./tellstickHw.js'),
 var modules = [];
 function init(){
 	modules.cronScheduler = cronScheduler.cronScheduler; 
+	modules.tellstickActuator = tellstickActuator.tellstickActuator;
 	client.smembers('users', function(err, userIds){
 		userIds.forEach(function(userId){
 			client.smembers('user:' + userId + '.parts', function(err, parts){
@@ -20,18 +21,18 @@ function init(){
 						return;
 					var part = new modules[splitted[0]]();
 					var context = ipl.getModuleContext(userId, splitted[1], splitted[0]);
-					part.init(context);
+					client.get(util.format('user:%s.%s:%s', userId, splitted[0], splitted[1]), function(err, data){
+						if(data != null){
+							context.settings = JSON.parse(data.toString());
+						}
+						part.init(context);				
+					});
 				});
 			});
 		});
 	});
 };
-var sensor = new tellstickSensor.tellstickSensor();
 var iplProc = new iplProcessor.iplProcessor();
-var actuator = new tellstickActuator.tellstickActuator();
-//var cron = new cronScheduler.cronScheduler();
-//sensor.init(ipl.getModuleContext(1, 1, 'tellstickSensor'));
 iplProc.init(ipl.getModuleContext(1, 1, 'IplProcessor'));
-//actuator.init(ipl.getModuleContext(1, 1, 'tellstickActuator'));
-//cron.init(ipl.getModuleContext(1, 1, 'cronScheduler'));
+//client.set('user:1.cronScheduler:1', JSON.stringify( {name:'crontest', cron:'0-58/2 * * * *', command:'on'}));
 init();

@@ -5,8 +5,11 @@ exports.cronScheduler = function(){
 	this.init = function(ipl){
 		console.log('cron init');
 		this.ipl = ipl;
-		schedule.scheduleJob('*	* * * *', function(){
-			console.log('static time module every minute tick...');
+		console.log(this.ipl.settings);
+		var me = this;
+		schedule.scheduleJob(this.ipl.settings.cron, function(){
+			console.log(me.ipl.settings.cron + ' ' + me.ipl.settings.command);
+			me.ipl.triggerChanged({command: me.ipl.settings.command});
 		});
 	};	
 };
