@@ -132,6 +132,5 @@ var doAction = function(){
 	});
 };
 populateDevices(function(){
-	console.log(devices);
 	doAction();
 });

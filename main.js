@@ -3,6 +3,8 @@ var	tellstickHw = require('./tellstickHw.js'),
 	iplProcessor = require('./iplProcessor.js'),
 	tellstickActuator = require('./tellstickActuator.js'),
 	cronScheduler = require('./cronScheduler.js'),
+	passThrough = require('./passThrough.js'),
+	sunRiseSet = require('./sunRiseSet.js'),
 	redis = require("redis"),
         client = redis.createClient(),
 	ipl = require('./ipl.js'),
@@ -12,6 +14,8 @@ var modules = [];
 function init(){
 	modules.cronScheduler = cronScheduler.cronScheduler; 
 	modules.tellstickActuator = tellstickActuator.tellstickActuator;
+	modules.passThrough = passThrough.passThrough;
+	modules.sunRiseSet = sunRiseSet.sunRiseSet;
 	client.smembers('users', function(err, userIds){
 		userIds.forEach(function(userId){
 			client.smembers('user:' + userId + '.parts', function(err, parts){
