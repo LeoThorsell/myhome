@@ -14,22 +14,21 @@ client.on("error", function (err) {
 //});
 var createDevice = function(actuator, callback){
 	console.log(actuator);
-	var newDevice = {}; 
 	var validInputs = ['unit', 'house', 'code']; //Todo: add other inputs
-	for(key in actuator)
-		newDevice[key] = actuator[key];
 	tellstick.addDevice(function(err, id){
-		console.log('new id:' + id);
+		var newDevice = {};
 		newDevice.id = id;
+		newDevice.protocol = actuator.protocol;
+		newDevice.model = actuator.model;
 		var tasks = [];
-		console.log(newDevice);		
 		tasks.push(function(cb){tellstick.setProtocol(newDevice.id, newDevice.protocol, cb);});
 		tasks.push(function(cb){tellstick.setModel(newDevice.id, newDevice.model, cb);});
-		for(key in newDevice){
+		for(key in actuator){
 			if(validInputs.indexOf(key)<0)
 				continue;
-			if(newDevice[key] == undefined || newDevice[key].length == 0 )
+			if(actuator[key] == undefined || actuator[key].length == 0 )
 				continue;
+			newDevice[key] = actuator[key];
 			(function(k){
 				tasks.push(function(cb){tellstick.setDeviceParameter(newDevice.id, k, newDevice[k], cb)});
 			})(key);
@@ -40,25 +39,29 @@ var createDevice = function(actuator, callback){
 			callback(newDevice);
 		});
 	});
-};
+}
 var populateDevices = function(callback){
 	tellstick.getDevices(function(err, tellstickDevices){
-		var parametersToRead = ['house', 'unit', 'group', 'command'];
+		var parametersToRead = ['house', 'unit'];
 		var deviceTasks = [];
 		tellstickDevices.forEach(function(d){
-			tasks = [];
-			tasks.push(function(cb){tellstick.getProtocol(d.id, cb)});
-			tasks.push(function(cb){tellstick.getModel(d.id, cb)});
+			var id = d.id;
+			var tasks = [];
+			var newDevice = {};
+			newDevice.id = id;
+			tasks.push(function(cb){tellstick.getProtocol(id, cb)});
+			tasks.push(function(cb){tellstick.getModel(id, cb)});
 			parametersToRead.forEach(function(p){
-				tasks.push(function(cb){tellstick.getDeviceParameter(d.id, p, '', cb)});
+				tasks.push(function(cb){tellstick.getDeviceParameter(id, p, '', cb)});
 			});
 			deviceTasks.push(function(cb){
 				async.parallel(tasks, function(err, results){
-					d.protocol = results[0][0];
-					d.model = results[1][0];
-					for(var i=0;i<parametersToRead.length;i++)
-						d[parametersToRead[i]] = results[2+i][0];
-					devices.push(d);
+					newDevice.protocol = results[0][0];
+					newDevice.model = results[1][0];
+					for(var i=0;i<parametersToRead.length;i++){
+						newDevice[parametersToRead[i]] = results[2+i][0];
+					}
+					devices.push(newDevice);
 					cb();
 				});
 			});

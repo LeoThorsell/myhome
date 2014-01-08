@@ -3,7 +3,6 @@ var schedule = require('node-schedule');
 exports.cronScheduler = function(){
 	this.ipl = null;
 	this.init = function(ipl){
-		console.log('cron init');
 		this.ipl = ipl;
 		console.log(this.ipl.settings);
 		var me = this;
