@@ -1,7 +1,7 @@
 var tellstick = require('telldus'),
 	async = require('async'),
 	redis = require("redis"),
-        client = redis.createClient(),
+    client = redis.createClient(),
 	client2 = redis.createClient();
 var devices = []; 
 client.on("error", function (err) {
@@ -71,24 +71,26 @@ var populateDevices = function(callback){
 		});
 	});
 };
-var performCommand = function(device, command){
+var performCommand = function(device, command, callback){
 	if(device == undefined || device.id == undefined){
 		console.log('no device information provided');
 		return;
 	}
 	console.log(command + ' ' + device.id);	
-	if(command == 'turnoff'){
+	if(command == 'turnOff'){
 		tellstick.turnOff(device.id, function(err, val){
-			if(err==null)
-				return;
-			console.log('error turning off device');
+			if(err!=null)
+				console.log('error turning off device');
+			console.log('successfully turned off device ' + device.id);
+			callback();
 		});
 	}
-	if(command == 'turnon'){
+	if(command == 'turnOn'){
 		tellstick.turnOn(device.id, function(err, val){
-			if(err == null)
-				return;
-			console.log('error turning on device');
+			if(err != null)
+				console.log('error turning on device');
+			console.log('successfully turned off device ' + device.id);
+			callback();
 		});
 	}
 };
@@ -125,13 +127,15 @@ var doAction = function(){
 		});
 		if(deviceToOperate == null){
 			createDevice(actuator, function(device){
-				performCommand(device, actuator.method);
+				performCommand(device, actuator.method, function(){
+					doAction();
+				});
 			});
-			doAction();
 			return;
 		};
-		performCommand(deviceToOperate, actuator.method);
-		doAction();	
+		performCommand(deviceToOperate, actuator.method, function(){
+			doAction();			 
+		} );
 	});
 };
 populateDevices(function(){

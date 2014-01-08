@@ -56,7 +56,7 @@ exports.sunRiseSet = function(){
 				if(action.type == 'rise')
 					me.ipl.triggerChanged({command:'Off'});
 				else
-					me.ipl.triggerChanged({command:'Off'});
+					me.ipl.triggerChanged({command:'On'});
 				me.setNextTime();
 			}, action.time.getTime()-now.getTime());
 			break;
