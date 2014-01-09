@@ -37,5 +37,6 @@ function init(){
 	});
 };
 var iplProc = new iplProcessor.iplProcessor();
+iplProc.init(ipl.getModuleContext(1, 1, 'IplProcessor'));
 //redis();
 init();
