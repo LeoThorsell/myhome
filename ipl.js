@@ -1,8 +1,8 @@
-var 	seaport = require('seaport'),
+var seaport = require('seaport'),
 	net = require('net'),
 	util = require('util'),
 	redis = require("redis"),
-        client = redis.createClient(),
+    client = redis.createClient(),
 	seaportServer = seaport.createServer(),
 	seaportClient = seaport.connect('localhost', 4100);
 
