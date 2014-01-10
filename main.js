@@ -16,6 +16,7 @@ function init(){
 	modules.tellstickActuator = tellstickActuator.tellstickActuator;
 	modules.passThrough = passThrough.passThrough;
 	modules.sunRiseSet = sunRiseSet.sunRiseSet;
+	modules.tellstickSensor = tellstickSensor.tellstickSensor;
 	client.smembers('users', function(err, userIds){
 		userIds.forEach(function(userId){
 			client.smembers('user:' + userId + '.parts', function(err, parts){
