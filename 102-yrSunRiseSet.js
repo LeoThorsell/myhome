@@ -70,8 +70,9 @@ function sunRiseSet(){
 		var today = new Date();
 		var tomorrow = new Date();
 		tomorrow.setDate(today.getDate()+1);
-		var todayString = util.format('%s-%s-%s', today.getFullYear(), ('00'+today.getMonth()+1).slice(-2), ('00'+today.getDate()).slice(-2));
-		var tomorrowString = util.format('%s-%s-%s', tomorrow.getFullYear(), ('00'+tomorrow.getMonth()+1).slice(-2), ('00' + tomorrow.getDate()).slice(-2));;
+		console.log(tomorrow);
+		var todayString = util.format('%s-%s-%s',       today.getFullYear(), ('00'+(today   .getMonth()+1)).slice(-2), ('00'+ today    .getDate()).slice(-2));
+		var tomorrowString = util.format('%s-%s-%s', tomorrow.getFullYear(), ('00'+(tomorrow.getMonth()+1)).slice(-2), ('00' + tomorrow.getDate()).slice(-2));
 		var uri = util.format('http://api.yr.no/weatherapi/sunrise/1.0/?lat=%s;lon=%s;from=%s;to=%s',
 			this.lat, this.lon, todayString, tomorrowString);
 		var options = url.parse(uri);

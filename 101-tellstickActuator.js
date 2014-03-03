@@ -17,6 +17,7 @@ var RED = require(process.env.NODE_RED_HOME+"/red/red");
 var	util = require('util');
 var	tellstick = require('telldus');
 var async = require('async');
+var tellstickHw;
 // The main node definition - most things happen in here
 function TellstickActuator(n) {
 	//class:command;protocol:arctech;model:selflearning;house:7462818;unit:1;group:0;method:turnoff;
@@ -25,30 +26,37 @@ function TellstickActuator(n) {
 	this.unit = n.unit;
 	this.name = n.name;
 	var me = this;
-	this.hw = new tellstickHw();
-	this.hw.init(function(){
+	tellstickHw.init(function(){
+		console.log('init done');
 		me.on('input', function(msg){
 			var command =  util.format('class:command;protocol:arctech;model:selflearning-switch;house:%s;unit:%s;group:0;method:',
 									   this.house, this.unit)
-			console.log('tellstickdevices populated');
 			if(msg.payload == 'turnon')
-				me.hw.doAction(command + 'turnon');
+				tellstickHw.doAction(command + 'turnon');
 			else if(msg.payload == 'turnoff')
-				me.hw.doAction(command + 'turnoff');		
+				tellstickHw.doAction(command + 'turnoff');		
 		});
 	});
 }
 RED.nodes.registerType("TellstickActuator",TellstickActuator);
 
-function tellstickHw(){
-	this.devices = [];
-	var deviceKeysToCompare = ['protocol', 'house', 'unit', 'model'];
-	var validInputs = ['unit', 'house', 'code']; //Todo: add other inputs
-
-	this.init = function(callback){
-		this.populateDevices(callback);
-	};
-	this.createDevice = function(actuator, callback){
+tellstickHw = {
+	devices: [],
+	deviceKeysToCompare: ['protocol', 'house', 'unit', 'model'],
+	validInputs: ['unit', 'house', 'code'], //Todo: add other inputs
+	initialized: false,
+	initCallbacks: [],
+	init: function(callback){
+		if(!this.initalized)
+		{
+			this.initCallbacks.push(callback);
+			if(this.initCallbacks.length==1)
+				this.populateDevices(callback);
+		}
+		else
+			callback();
+	},
+	createDevice: function(actuator, callback){
 			var me = this;
 			tellstick.addDevice(function(err, id){
 			var newDevice = {};
@@ -75,8 +83,8 @@ function tellstickHw(){
 					callback(newDevice);
 			});
 		});
-	}
-	this.populateDevices = function(callback){
+	},
+	populateDevices: function(callback){
 		var self = this;
 		tellstick.getDevices(function(err, tellstickDevices){
 			var parametersToRead = ['house', 'unit'];
@@ -106,12 +114,18 @@ function tellstickHw(){
 				});
 			});
 			async.series(deviceTasks, function(){
-				if(typeof(callback) == "function")
-					callback();
+				console.log('populate devices done');
+				self.initialized = true;
+				for(var i=0;i<self.initCallbacks.length;++i)
+				{
+					console.log(i);
+					if(typeof(self.initCallbacks[i]) == "function")
+						self.initCallbacks[i]();
+				}
 			});
 		});
-	};
-	this.performCommand = function(device, command, callback){
+	},
+	performCommand: function(device, command, callback){
 		if(device == undefined || device.id == undefined){
 			console.log('no device information provided');
 			return;
@@ -135,12 +149,13 @@ function tellstickHw(){
 					callback();
 			});
 		}
-	};
-	this.doAction = function(actuatorString){
+	},
+	doAction: function(actuatorString){
 		var deviceToOperate = null;
 		console.log('actuator hw, command');
 		var keyValues = actuatorString.toString().split(';');
 		var actuator = {};
+		var self = this;
 		keyValues.forEach(function(keyValue){
 			var splitted = keyValue.split(':');
 			if(splitted.length < 2)
@@ -152,7 +167,7 @@ function tellstickHw(){
 				return;
 			var correctDevice = true;
 			for(key in device){
-				if(deviceKeysToCompare.indexOf(key) == -1)
+				if(self.deviceKeysToCompare.indexOf(key) == -1)
 					continue;
 				if(device[key] != actuator[key]){
 					correctDevice = false;
@@ -172,5 +187,5 @@ function tellstickHw(){
 			return;
 		};
 		this.performCommand(deviceToOperate, actuator.method);
-	};
+	}
 }
