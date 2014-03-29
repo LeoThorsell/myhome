@@ -46,6 +46,7 @@ function tellstickHw(){
 		var me = this;
 		tellstick.addRawDeviceEventListener(function(err, data){
 			var obj = {};
+			//console.log(data);
 			var propertyStrings = data.split(';');
 			propertyStrings.forEach(function(propertyString){
 				var keyValue = propertyString.split(':');
