@@ -56,3 +56,7 @@ function tellstickHw(){
 		});
 	};
 }
+
+module.exports = {
+	tellstickHw: tellstickHw
+};

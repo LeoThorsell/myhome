@@ -13,28 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-var sys = require('sys')
-var exec = require('child_process').exec;
 var RED = require(process.env.NODE_RED_HOME+"/red/red");
 
-function LircOutput(n) {
+function RemoteConverter(n) {
 	RED.nodes.createNode(this,n);
+	var self = this;
 	this.on('input', function(msg){
-		sendCommand(
-			msg.payload.device,
-			msg.payload.command,
-			1
-		);
-	});
+		var toSend = {};
+		if(msg.payload.device != 'thomson')
+			return;
+		var command = msg.payload.command;
+		if(!(command in keymap))
+			return;
+		toSend.payload = keymap[command];
+		self.send(toSend);
+	});	
 };
+var keymap = {
+	"0": "Key0",
+	"1": "Key1",
+	"2": "Key2",
+	"3": "Key3",
+	"4": "Key4",
+	"5": "Key5",
+	"6": "Key6",
+	"7": "Key7",
+	"8": "Key8",
+	"9": "Key9",
+	"progdown": "Keyleft",
+	"progup": "Keyright",
+	"left": "Keyleft",
+	"right": "Keyright",
+	"up": "Keyup",
+	"down": "Keydown",
+	"ok": "KeyOK",
+	"back": "Keylame",
+	"exit": "Keylame",
+	"menu": "Keymenu",
+};
+RED.nodes.registerType("RemoteConverter", RemoteConverter);
 
-RED.nodes.registerType("LircOutput", LircOutput);
-//string.Format("irsend send_once {0} {1} -# {2}", command.Device, command.Key, command.Count.ToString()));
-var sendCommand = function(device, command, count){
-	var command = 'irsend send_once ' + device + ' ' + command + ' -# ' + count;
-	child = exec(command, function (error, stdout, stderr) {
-		if (error !== null) {
-			console.log('exec error: ' + error);
-		}
-	});
-}
+

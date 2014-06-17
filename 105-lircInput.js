@@ -27,8 +27,14 @@ function LircInput(n) {
 	client.init();
 	client.dataCallback = function(data){
 		console.log(data);
+		var splitted = data.split(' ');
+		if(splitted.length != 4)
+			return;
 		var msg = {};
-		msg.payload = data;
+		var deviceCommand = {};
+		deviceCommand.device = splitted[3].slice(0, -1);
+		deviceCommand.command = splitted[2];
+		msg.payload = deviceCommand;
 		me.send(msg);
 	};
 };

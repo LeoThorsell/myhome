@@ -60,6 +60,10 @@ redisClient = {
 		this.client.on('ready', function(){
 			cb();
 		});
+		this.client.on('error', function(){
+			console.log(arguments);
+
+		});
 	},
 	log: function(key, value){
 		//console.log(key + ': ' + value);

@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-var sys = require('sys')
-var exec = require('child_process').exec;
 var RED = require(process.env.NODE_RED_HOME+"/red/red");
+var	util = require('util');
+var	tellstick = require('./103-tellstickSensor.js');
 
-function LircOutput(n) {
+function TellstickRemote(n) {
+	console.log('starting tellstick remote node');
 	RED.nodes.createNode(this,n);
-	this.on('input', function(msg){
-		sendCommand(
-			msg.payload.device,
-			msg.payload.command,
-			1
-		);
+
+	this.hw = new tellstick.tellstickHw();
+	var me = this;
+	this.hw.init(function(data){
+		if(data.class != 'command')
+			return;
+		var msg = [{},{}];
+		msg[0].payload = 'test';
+		msg[1].payload = data;
+		me.send(msg)
+		console.log(data);
 	});
+
+//	tellstick.addRawDeviceEventListener(function(controllerId, data){
+//		console.log(controllerid);
+//	this.send(data);
+//	}.bind(this));
+	console.log('done starting tellstick remote node');
 };
 
-RED.nodes.registerType("LircOutput", LircOutput);
-//string.Format("irsend send_once {0} {1} -# {2}", command.Device, command.Key, command.Count.ToString()));
-var sendCommand = function(device, command, count){
-	var command = 'irsend send_once ' + device + ' ' + command + ' -# ' + count;
-	child = exec(command, function (error, stdout, stderr) {
-		if (error !== null) {
-			console.log('exec error: ' + error);
-		}
-	});
-}
+RED.nodes.registerType("TellstickRemote", TellstickRemote);
+
