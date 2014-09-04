@@ -30,7 +30,6 @@ function InfluxLogger(n) {
 	var me = this;
 	console.log('starting influx, ' + this.tsName);
 	influxClient.init(function(){
-		console.log('influxinit done');
 		me.on('input', function(msg){
 			influxClient.log(me.tsName, msg.payload);
 		});
@@ -71,8 +70,6 @@ influxClient = {
 	},
 	log: function(key, value){
 		var val = parseFloat(value);
-		console.log(key + ': ' + val);
-		
 		if(isNaN(val)){
 			console.log('invalid: ' + ': ' + value);
 		   	return;

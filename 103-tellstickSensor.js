@@ -32,6 +32,8 @@ function TellstickSensor(n) {
 		var msg = new Array(3);
 		for(var i=0;i<3;i++)
 			msg[i]={};
+		if(sensor.temp>99 || sensor.humidity>99)
+			return;
 		msg[0].payload = sensor.temp;
 		msg[1].payload = sensor.humidity;
 		msg[2].payload = sensor;
@@ -46,7 +48,6 @@ function tellstickHw(){
 		var me = this;
 		tellstick.addRawDeviceEventListener(function(err, data){
 			var obj = {};
-			//console.log(data);
 			var propertyStrings = data.split(';');
 			propertyStrings.forEach(function(propertyString){
 				var keyValue = propertyString.split(':');

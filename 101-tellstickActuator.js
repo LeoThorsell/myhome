@@ -34,6 +34,10 @@ function TellstickActuator(n) {
 			if(msg.payload == 'turnon')
 				tellstickHw.doAction(command + 'turnon');
 			else if(msg.payload == 'turnoff')
+				tellstickHw.doAction(command + 'turnoff');
+			else if(msg.payload.command == 'turnon')
+				tellstickHw.doAction(command + 'turnon');
+			else if(msg.payload.command == 'turnoff')
 				tellstickHw.doAction(command + 'turnoff');		
 		});
 	});
@@ -59,25 +63,26 @@ tellstickHw = {
 	createDevice: function(actuator, callback){
 			var me = this;
 			tellstick.addDevice(function(err, id){
-			var newDevice = {};
-			newDevice.id = id;
-			newDevice.protocol = actuator.protocol;
-			newDevice.model = actuator.model;
-			var tasks = [];
-			tasks.push(function(cb){tellstick.setProtocol(newDevice.id, newDevice.protocol, cb);});
-			tasks.push(function(cb){tellstick.setModel(newDevice.id, newDevice.model, cb);});
-			for(key in actuator){
-				if(validInputs.indexOf(key)<0)
-					continue;
-				if(actuator[key] == undefined || actuator[key].length == 0 )
-					continue;
-				newDevice[key] = actuator[key];
-				(function(k){
-					tasks.push(function(cb){tellstick.setDeviceParameter(newDevice.id, k, newDevice[k], cb)});
-				})(key);
-			}
-			async.parallel(tasks, function(err, results){
-				me.devices.push(newDevice);
+				var newDevice = {};
+				newDevice.id = id;
+				newDevice.protocol = actuator.protocol;
+				newDevice.model = actuator.model;
+				var tasks = [];
+				console.log(newDevice.id);
+				tasks.push(function(cb){tellstick.setProtocol(newDevice.id, newDevice.protocol, cb);});
+				tasks.push(function(cb){tellstick.setModel(newDevice.id, newDevice.model, cb);});
+				for(key in actuator){
+					if(me.validInputs.indexOf(key)<0)
+						continue;
+					if(actuator[key] == undefined || actuator[key].length == 0 )
+						continue;
+					newDevice[key] = actuator[key];
+					(function(k){
+						tasks.push(function(cb){tellstick.setDeviceParameter(newDevice.id, k, newDevice[k], cb)});
+					})(key);
+				}
+				async.parallel(tasks, function(err, results){
+					me.devices.push(newDevice);
 				console.log('new device added: id='+newDevice.id);
 				if(callback instanceof Function)
 					callback(newDevice);
