@@ -14,39 +14,39 @@
   limitations under the License.
 -->
 
-<script type="text/x-red" data-template-name="TellstickRemote">
+<script type="text/x-red" data-template-name="Timer">
 	<div class="form-row">
-		<label for="node-input-name"><i class="icon-tasks" />Name</label>
-        <input type="text" id="node-input-name" placeholder="name" />
-    </div>
-	<div class="form-row">
-		<label for="node-input-house"><i class="icon-tasks" />House code</label>
-        <input type="text" id="node-input-house" placeholder="house" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-unit"><i class="icon-tag" />Unit</label>
-        <input type="text" id="node-input-unit" placeholder="unit" />
+		<label for="node-input-startInput"><i class="icon-tasks" />StartInput</label>
+        <input type="text" id="node-input-startInput" placeholder="startInput" />
 	</div>
+	<div class="form-row">
+		<label for="node-input-stopOutput"><i class="icon-tasks" />Stop output</label>
+        <input type="text" id="node-input-stopOutput" placeholder="stopOutput" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-delay"><i class="icon-tasks" />Delay in seconds</label>
+        <input type="text" id="node-input-delay" placeholder="delay" />
+    </div>
 </script>
 
-<script type="text/x-red" data-help-name="TellstickRemote">
-	<p>Tellstick remote input</p>
+<script type="text/x-red" data-help-name="Timer">
+	<p>Sliding timer</p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('TellstickRemote',{
-        category: 'input',      // the palette category
-		color:"#d6444f",
+    RED.nodes.registerType('Timer',{
+        category: 'output',      // the palette category
+		color:"#b6a1aF",
 		defaults: {             // defines the editable properties of the node
-			name: {value:""},
-			house: {value:""},   //  along with default values.
-			unit: {value:""},
+			startInput: {value:""},
+			stopOutput: {value:""},   //  along with default values.
+			delay: {value:""},
         },
-        inputs:0,                // set the number of inputs - only 0 or 1
+        inputs:1,                // set the number of inputs - only 0 or 1
         outputs:1,               // set the number of outputs - 0 to n
         icon: "arrow-in.png",    // set the icon (held in public/icons)
         label: function() {      // sets the default label contents
-            return this.tsName || 'TellstickRemote';
+            return 'sliding timer';
         },
         labelStyle: function() { // sets the class to apply to the label
             return this.name?"node_label_italic":"";

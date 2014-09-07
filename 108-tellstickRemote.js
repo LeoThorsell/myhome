@@ -15,30 +15,53 @@
  **/
 var RED = require(process.env.NODE_RED_HOME+"/red/red");
 var	util = require('util');
-var	tellstick = require('./103-tellstickSensor.js');
+var tellstick = require('telldus');
 
 function TellstickRemote(n) {
 	console.log('starting tellstick remote node');
 	RED.nodes.createNode(this,n);
-
-	this.hw = new tellstick.tellstickHw();
+	this.house = n.house;
+	this.unit = n.unit;
+	this.hw = new tellstickHw();
 	var me = this;
+	this.lastCommmand = '';
+	this.lastCommandTime = 0;
 	this.hw.init(function(data){
 		if(data.class != 'command')
 			return;
-		var msg = [{},{}];
-		msg[0].payload = 'test';
-		msg[1].payload = data;
-		me.send(msg)
+		if(data.protocol != 'arctech')
+			return;
+		if(data.house != me.house)
+			return;
+		if(data.unit != me.unit)
+			return;
+		var time = new Date();
+		if(me.lastCommand == data.method && time - me.lastCommandTime<2000)
+			return;
+		me.lastCommandTime = time;
+		me.lastCommand = data.method;
 		console.log(data);
+		var msg = {};
+		msg.payload = data.method;
+		me.send(msg)
 	});
 
-//	tellstick.addRawDeviceEventListener(function(controllerId, data){
-//		console.log(controllerid);
-//	this.send(data);
-//	}.bind(this));
 	console.log('done starting tellstick remote node');
 };
 
 RED.nodes.registerType("TellstickRemote", TellstickRemote);
 
+function tellstickHw(){
+	this.init = function(callback){
+		var me = this;
+		tellstick.addRawDeviceEventListener(function(err, data){
+			var obj = {};
+			var propertyStrings = data.split(';');
+			propertyStrings.forEach(function(propertyString){
+				var keyValue = propertyString.split(':');
+				obj[keyValue[0]]=keyValue[1];
+			});
+			callback(obj);
+		});
+	};
+}
