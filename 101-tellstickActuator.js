@@ -27,7 +27,6 @@ function TellstickActuator(n) {
 	this.name = n.name;
 	var me = this;
 	tellstickHw.init(function(){
-		console.log('init done');
 		me.on('input', function(msg){
 			var command =  util.format('class:command;protocol:arctech;model:selflearning-switch;house:%s;unit:%s;group:0;method:',
 									   this.house, this.unit)
@@ -123,7 +122,6 @@ tellstickHw = {
 				self.initialized = true;
 				for(var i=0;i<self.initCallbacks.length;++i)
 				{
-					console.log(i);
 					if(typeof(self.initCallbacks[i]) == "function")
 						self.initCallbacks[i]();
 				}

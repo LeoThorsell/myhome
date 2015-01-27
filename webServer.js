@@ -19,7 +19,6 @@ var RED = require(process.env.NODE_RED_HOME+"/red/red");
 
 function WebServer(n) {
 	RED.nodes.createNode(this,n);
-	console.log(n);
 	var file = new static.Server(n.path);
 	http.createServer(function (request, response) {
 		request.addListener('end', function () {

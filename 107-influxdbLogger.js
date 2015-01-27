@@ -41,7 +41,7 @@ RED.nodes.registerType("InfluxLogger", InfluxLogger);
 influxClient = {
 	initialized: false,
 	initCallbacks: [],	
-	host: '192.168.0.108',
+	host: '192.168.0.117',
 	port: 8086,
 	username: 'nodered',
 	password: 'nodered',

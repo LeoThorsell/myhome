@@ -23,7 +23,7 @@ function LircOutput(n) {
 		sendCommand(
 			msg.payload.device,
 			msg.payload.command,
-			1
+			1	
 		);
 	});
 };

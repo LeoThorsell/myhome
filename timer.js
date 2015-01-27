@@ -23,19 +23,23 @@ function Timer(n) {
 	this.delay = n.delay*1000;
 	var me = this;
 	this.on('input', function(msg){
-		console.log(msg);
 		if(msg.payload != me.startInput)
 			return;
+		console.log(msg);
 		if(me.timerHandle != null){
 			clearTimeout(me.timerHandle);
 		}
-		else
-			me.send({payload:me.startInput});
+		else{
+			setTimeout(function(){
+				me.send({payload:me.startInput});
+			}, 800);
+		}
 		me.timerHandle = setTimeout(function(){
 			me.timerHandle = null;
 			var toSend = {};
 			toSend.payload = me.stopOutput;
 			me.send(toSend);
+			
 		}, me.delay);
 	});
 };
